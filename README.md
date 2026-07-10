@@ -15,7 +15,7 @@ This project implements a complete wallet and transfer system with the following
 ## Tech Stack
 
 - **Framework**: Spring Boot 4.1.0
-- **Language**: Java 17
+- **Language**: Java 21
 - **Database**: PostgreSQL 17
 - **Cache**: Redis 7
 - **Message Queue**: Apache Kafka 7.7.0
@@ -56,9 +56,10 @@ This project follows **Hexagonal Architecture (Ports & Adapters)**:
 
 ## Prerequisites
 
-- Java 17+
+- Java 21+
 - Maven 3.8+
 - Docker & Docker Compose
+- (Optional) Java Virtual Threads support for concurrency testing (requires Java 21)
 
 ## Getting Started
 
@@ -77,7 +78,7 @@ This will start:
 
 ### 2. Configure Database
 
-Update `src/main/resources/application.yml` with your database credentials if needed.
+Use an `.env` file and environment variables for secrets. Ensure `DB_*`, `REDIS_*`, and Kafka/Outbox related environment variables are set (see `src/main/resources/application.yml` for keys). Do NOT commit secrets to the repo.
 
 ### 3. Build and Run the Application
 
@@ -106,17 +107,23 @@ The application will start on `http://localhost:8080`
 - Idempotent transfer requests (using idempotency keys)
 - Distributed locking to prevent race conditions
 - Double-entry ledger for financial accuracy
+- Resilience and retry support to handle optimistic locking conflicts
 
 ### 4. Transaction Tracking
 - Complete transaction history
 - Ledger entries for audit trails
-- Outbox pattern for reliable event publishing
+- Outbox pattern for reliable event publishing (new OutboxEvent entity & migration)
 
-### 5. Caching & Performance
+### 5. Concurrency Testing (Developer)
+- A dedicated endpoint exists to stress-test concurrency using Java virtual threads:
+  - `GET /api/v1/test-concurrency-safety` — runs many virtual-thread tasks that invoke the transfer API and returns a summary of results.
+  - Requires Java 21 (Project Loom virtual threads). Use only in development or test environments; do NOT run in production.
+
+### 6. Caching & Performance
 - Redis caching for frequently accessed data
 - Distributed locks for concurrent transfer safety
 
-### 6. Event Publishing
+### 7. Event Publishing
 - Kafka-based event streaming for asynchronous processing
 - Outbox pattern for transactional event delivery
 
