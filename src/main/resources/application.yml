@@ -2,6 +2,11 @@ spring:
   application:
     name: wallet-transfer-system
 
+  # VIRTUAL THREADS CONFIGURATION
+  threads:
+    virtual:
+      enabled: true
+
   # CUSTOM CONFIGURATION
   configuration:
     redis:
@@ -23,9 +28,9 @@ spring:
     password: admin123@
   
   jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
+#    hibernate:
+#      ddl-auto: validate
+#    show-sql: true
     # properties:
     #   hibernate:
     #     format_sql: true
