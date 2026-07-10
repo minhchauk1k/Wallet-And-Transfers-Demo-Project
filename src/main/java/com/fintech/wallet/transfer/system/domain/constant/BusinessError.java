@@ -26,7 +26,8 @@ public enum BusinessError {
     INSUFFICIENT_BALANCE("TXN-001", "Insufficient balance.", HttpStatus.FORBIDDEN),
     DUPLICATE_TRANSACTION_BY_KEY("TXN-002", "Duplicate transaction with Key %s.", HttpStatus.CONFLICT),
     SELF_TRANSFER("TXN-003", "Self-transfer is not allowed.", HttpStatus.BAD_REQUEST),
-    LEDGER_ENTRY_AMOUNT_MISMATCH("TXN-004", "Ledger entry amount mismatch: Total credit (%s) must equal total debit (%s).", HttpStatus.BAD_REQUEST);
+    LEDGER_ENTRY_AMOUNT_MISMATCH("TXN-004", "Ledger entry amount mismatch: Total credit (%s) must equal total debit (%s).", HttpStatus.BAD_REQUEST),
+    TRANSACTION_FAILED("TXN-005", "Transaction failed. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String errorCode;
     private final String errorMessage;

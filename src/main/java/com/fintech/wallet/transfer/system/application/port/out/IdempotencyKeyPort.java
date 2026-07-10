@@ -6,11 +6,8 @@ import java.util.Optional;
 
 public interface IdempotencyKeyPort {
 
-    boolean tryLock(String idempotencyKey);
-
-    void releaseLock(String idempotencyKey);
-
     Optional<String> getResult(String idempotencyKey);
 
     void saveResult(String idempotencyKey, Transaction transaction);
+
 }

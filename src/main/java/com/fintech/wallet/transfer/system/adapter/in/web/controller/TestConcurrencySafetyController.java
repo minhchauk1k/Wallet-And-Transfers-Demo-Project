@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
@@ -27,9 +28,9 @@ public class TestConcurrencySafetyController {
     }
 
     @GetMapping
-    public ResponseEntity<?> testConcurrencySafety() {
-        int numberOfRequest = 10000;
+    public ResponseEntity<?> testConcurrencySafety(@RequestParam int numberOfRequest) {
         Map<String, Integer> resultMaps = new ConcurrentHashMap<>();
+        numberOfRequest = numberOfRequest != 0 ? numberOfRequest : 1000;
 
         // test with [VirtualThreadPerTask]
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
@@ -49,7 +50,7 @@ public class TestConcurrencySafetyController {
                         Transaction result = transferMoneyUseCase.transfer(command);
                         resultMaps.merge(result.getStatus().name(), 1, Integer::sum);
                     } catch (Exception exception) {
-                        resultMaps.merge(exception.getMessage(), 1, Integer::sum);
+                        resultMaps.merge(exception.getClass().getCanonicalName() + ": " + exception.getMessage(), 1, Integer::sum);
                     }
                     // End of the [Task]
                 });
