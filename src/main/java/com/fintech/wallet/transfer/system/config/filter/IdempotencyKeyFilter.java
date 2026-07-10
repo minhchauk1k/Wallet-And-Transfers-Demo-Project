@@ -40,6 +40,7 @@ public class IdempotencyKeyFilter extends OncePerRequestFilter {
 
         if (!request.getRequestURI().startsWith(MONEY_TRANSFER_ENDPOINT)) {
             filterChain.doFilter(request, response);
+            return;
         }
 
         response.setCharacterEncoding(CHARACTER_ENCODING);
