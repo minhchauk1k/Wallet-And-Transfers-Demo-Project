@@ -3,6 +3,7 @@ package com.fintech.wallet.transfer.system.application.service;
 import com.fintech.wallet.transfer.system.application.constant.ApplicationError;
 import com.fintech.wallet.transfer.system.application.exception.ApplicationException;
 import com.fintech.wallet.transfer.system.application.port.in.TransferMoneyUseCase;
+import com.fintech.wallet.transfer.system.application.port.out.IdempotencyKeyPort;
 import com.fintech.wallet.transfer.system.application.port.out.LedgerEntryRepositoryPort;
 import com.fintech.wallet.transfer.system.application.port.out.TransactionRepositoryPort;
 import com.fintech.wallet.transfer.system.application.port.out.WalletRepositoryPort;
@@ -26,11 +27,13 @@ public class TransferMoneyService implements TransferMoneyUseCase {
     private final TransactionRepositoryPort transactionRepositoryPort;
     private final WalletRepositoryPort walletRepositoryPort;
     private final LedgerEntryRepositoryPort ledgerEntryRepositoryPort;
+    private final IdempotencyKeyPort idempotencyKeyPort;
 
-    public TransferMoneyService(TransactionRepositoryPort transactionRepositoryPort, WalletRepositoryPort walletRepositoryPort, LedgerEntryRepositoryPort ledgerEntryRepositoryPort) {
+    public TransferMoneyService(TransactionRepositoryPort transactionRepositoryPort, WalletRepositoryPort walletRepositoryPort, LedgerEntryRepositoryPort ledgerEntryRepositoryPort, IdempotencyKeyPort idempotencyKeyPort) {
         this.transactionRepositoryPort = transactionRepositoryPort;
         this.walletRepositoryPort = walletRepositoryPort;
         this.ledgerEntryRepositoryPort = ledgerEntryRepositoryPort;
+        this.idempotencyKeyPort = idempotencyKeyPort;
     }
 
     @Override
@@ -86,6 +89,9 @@ public class TransferMoneyService implements TransferMoneyUseCase {
         /* 7. Mark [Transaction] is completed (Status=COMPLETED) */
         newTransaction.completed();
         Transaction saved = transactionRepositoryPort.save(newTransaction);
+
+        /* 8. Save result of [Transaction] as [Cache] */
+        idempotencyKeyPort.saveResult(command.idempotencyKey(), saved);
 
         log.info("END: Money transfer processing!");
         return saved;

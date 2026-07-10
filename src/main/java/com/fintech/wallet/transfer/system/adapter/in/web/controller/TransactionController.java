@@ -1,7 +1,7 @@
 package com.fintech.wallet.transfer.system.adapter.in.web.controller;
 
+import com.fintech.wallet.transfer.system.adapter.constant.AdapterConstant;
 import com.fintech.wallet.transfer.system.adapter.in.web.dto.TransactionRequest;
-import com.fintech.wallet.transfer.system.application.constant.ApplicationConst;
 import com.fintech.wallet.transfer.system.application.port.in.TransferMoneyUseCase;
 import com.fintech.wallet.transfer.system.domain.model.Transaction;
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<?> transfer(
-            @RequestHeader(ApplicationConst.HEADER_IDEMPOTENCY_KEY) String idempotencyKey,
+            @RequestHeader(AdapterConstant.HEADER_IDEMPOTENCY_KEY) String idempotencyKey,
             @Valid @RequestBody TransactionRequest request
     ) {
 
