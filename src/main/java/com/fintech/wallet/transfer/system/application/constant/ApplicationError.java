@@ -10,7 +10,8 @@ public enum ApplicationError {
 
     CUSTOMER_NOT_FOUND_BY_ID("CUS-001", "Customer with ID %s not found.", HttpStatus.NOT_FOUND),
     WALLET_NOT_FOUND_BY_ID("WAL-001", "Wallet with ID %s not found.", HttpStatus.NOT_FOUND),
-    WALLET_NOT_FOUND_BY_WALLET_NUMBER("WAL-002", "Wallet %s not found.", HttpStatus.NOT_FOUND);
+    WALLET_NOT_FOUND_BY_WALLET_NUMBER("WAL-002", "Wallet %s not found.", HttpStatus.NOT_FOUND),
+    MISSING_IDEMPOTENCY_KEY("APP-001", "Missing required HTTP header: Idempotency-Key", HttpStatus.BAD_REQUEST);
 
     private final String errorCode;
     private final String errorMessage;

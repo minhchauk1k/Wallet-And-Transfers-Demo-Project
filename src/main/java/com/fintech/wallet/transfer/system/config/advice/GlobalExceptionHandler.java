@@ -1,4 +1,4 @@
-package com.fintech.wallet.transfer.system.config.handler;
+package com.fintech.wallet.transfer.system.config.advice;
 
 import com.fintech.wallet.transfer.system.application.exception.ApplicationException;
 import com.fintech.wallet.transfer.system.domain.exception.BusinessException;
