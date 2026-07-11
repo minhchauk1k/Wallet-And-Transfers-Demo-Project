@@ -51,7 +51,10 @@ public class TransferMoneyService implements TransferMoneyUseCase {
             multiplier = 2.0    // 50ms -> 100ms -> 200ms -> 400ms -> 800ms ...
     )
     public Transaction transfer(TransferTransactionCommand command) {
-        if (distributedLockPort.tryLock("TransferMoneyService")) {
+        String lockKey = "TransferMoneyService";
+        boolean isLocked = distributedLockPort.tryLock(lockKey);
+
+        if (isLocked) {
             try {
                 log.info("[START]: Money transfer processing ...");
 
@@ -102,21 +105,27 @@ public class TransferMoneyService implements TransferMoneyUseCase {
                 /* 8. Save result of [Transaction] as [Cache] */
                 idempotencyKeyPort.saveResult(command.idempotencyKey(), saved);
 
+                /* 9. Release [DistributedLock] of [idempotencyKey] (check logic lock at request [Filter] layer) */
+                distributedLockPort.releaseLock(command.idempotencyKey());
+
                 log.info("[END]: Money transfer processing!");
                 return saved;
+            } catch (BusinessException exception) {
+                throw exception;
             } catch (Exception exception) {
                 log.error("[ERROR]: {}", exception.getMessage());
                 throw exception;
             } finally {
-                distributedLockPort.releaseLock("TransferMoneyService");
+                distributedLockPort.releaseLock(lockKey);
             }
         } else {
             try {
-                /* Delay 50ms */
                 Thread.sleep(50);
-
                 return transfer(command);
-            } catch (InterruptedException exception) {
+            } catch (BusinessException exception) {
+                throw exception;
+            } catch (Exception exception) {
+                log.error("[ERROR]: {}", exception.getMessage());
                 throw new BusinessException(BusinessError.TRANSACTION_FAILED);
             }
         }

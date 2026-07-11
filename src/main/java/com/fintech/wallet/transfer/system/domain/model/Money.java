@@ -1,5 +1,6 @@
 package com.fintech.wallet.transfer.system.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fintech.wallet.transfer.system.domain.constant.BusinessError;
 import com.fintech.wallet.transfer.system.domain.exception.BusinessException;
 import lombok.EqualsAndHashCode;
@@ -23,6 +24,7 @@ public final class Money {
      * @param currency ISO 4217 currency code (non-null, non-empty). Normalized to upper case.
      * @throws BusinessException if amount is negative, currency is null/empty, or currency code is invalid.
      */
+    @JsonCreator
     private Money(BigDecimal amount, String currency) {
         /* check negative */
         if (amount.compareTo(BigDecimal.ZERO) < 0) {

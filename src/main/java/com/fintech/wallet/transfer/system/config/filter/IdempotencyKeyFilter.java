@@ -1,6 +1,7 @@
 package com.fintech.wallet.transfer.system.config.filter;
 
 import com.fintech.wallet.transfer.system.adapter.constant.AdapterConstant;
+import com.fintech.wallet.transfer.system.adapter.out.cache.RedisDistributedLockAdapter;
 import com.fintech.wallet.transfer.system.adapter.out.cache.RedisIdempotencyKeyAdapter;
 import com.fintech.wallet.transfer.system.application.constant.ApplicationError;
 import jakarta.servlet.FilterChain;
@@ -24,14 +25,16 @@ import java.util.Optional;
 public class IdempotencyKeyFilter extends OncePerRequestFilter {
 
     private final RedisIdempotencyKeyAdapter redisIdempotencyKeyAdapter;
+    private final RedisDistributedLockAdapter redisDistributedLockAdapter;
     private final ObjectMapper objectMapper;
 
     private static final String MONEY_TRANSFER_ENDPOINT = "/api/v1/transactions";
     private static final String CONTENT_TYPE = "application/json";
     private static final String CHARACTER_ENCODING = "UTF-8";
 
-    public IdempotencyKeyFilter(RedisIdempotencyKeyAdapter redisIdempotencyKeyAdapter, ObjectMapper objectMapper) {
+    public IdempotencyKeyFilter(RedisIdempotencyKeyAdapter redisIdempotencyKeyAdapter, RedisDistributedLockAdapter redisDistributedLockAdapter, ObjectMapper objectMapper) {
         this.redisIdempotencyKeyAdapter = redisIdempotencyKeyAdapter;
+        this.redisDistributedLockAdapter = redisDistributedLockAdapter;
         this.objectMapper = objectMapper;
     }
 
@@ -59,12 +62,27 @@ public class IdempotencyKeyFilter extends OncePerRequestFilter {
             return;
         }
 
+        boolean isLocked = redisDistributedLockAdapter.tryLock(idempotencyKey);
+        if (!isLocked) {
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("code", HttpStatus.CONFLICT.value());
+            errorBody.put("message", ApplicationError.TRANSACTION_IN_PROGRESS.getErrorMessage());
+            errorBody.put("timestamp", Instant.now().toString());
+
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            response.getWriter().write(objectMapper.writeValueAsString(errorBody));
+            response.getWriter().flush();
+            return;
+        }
+
         Optional<String> cached = redisIdempotencyKeyAdapter.getResult(idempotencyKey);
         if (cached.isPresent()) {
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(cached.get());
             response.getWriter().flush();
             log.info("Cache hit!! Returning result for [{}={}].", AdapterConstant.HEADER_IDEMPOTENCY_KEY, idempotencyKey);
+
+            redisDistributedLockAdapter.releaseLock(idempotencyKey);
             return;
         }
 
