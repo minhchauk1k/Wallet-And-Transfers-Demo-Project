@@ -1,5 +1,6 @@
 package com.fintech.wallet.transfer.system.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fintech.wallet.transfer.system.domain.common.UUIDv7;
 import com.fintech.wallet.transfer.system.domain.constant.TransactionStatus;
 import lombok.EqualsAndHashCode;
@@ -23,6 +24,7 @@ public final class Transaction {
     private final String description;
     private final Instant createdAt;
 
+    @JsonCreator
     private Transaction(
             UUID id,
             String idempotencyKey,

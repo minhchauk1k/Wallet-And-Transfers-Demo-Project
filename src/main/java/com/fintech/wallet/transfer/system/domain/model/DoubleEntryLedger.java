@@ -1,5 +1,6 @@
 package com.fintech.wallet.transfer.system.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fintech.wallet.transfer.system.domain.constant.BusinessError;
 import com.fintech.wallet.transfer.system.domain.exception.BusinessException;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ public final class DoubleEntryLedger {
     private final LedgerEntry creditEntry;
     private final LedgerEntry debitEntry;
 
+    @JsonCreator
     private DoubleEntryLedger(LedgerEntry creditEntry, LedgerEntry debitEntry) {
         this.creditEntry = creditEntry;
         this.debitEntry = debitEntry;

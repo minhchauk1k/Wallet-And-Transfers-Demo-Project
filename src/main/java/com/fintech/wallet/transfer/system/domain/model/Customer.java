@@ -1,5 +1,6 @@
 package com.fintech.wallet.transfer.system.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fintech.wallet.transfer.system.domain.common.UUIDv7;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class Customer {
      * @param id       customer UUID identifier
      * @param fullName customer's full name
      */
+    @JsonCreator
     private Customer(UUID id, String fullName) {
         this.id = id;
         this.fullName = fullName;

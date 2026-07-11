@@ -1,5 +1,6 @@
 package com.fintech.wallet.transfer.system.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fintech.wallet.transfer.system.domain.common.UUIDv7;
 import com.fintech.wallet.transfer.system.domain.constant.BusinessError;
 import com.fintech.wallet.transfer.system.domain.constant.WalletStatus;
@@ -26,6 +27,7 @@ public class Wallet {
     private final Instant createdAt;
     private final long version;
 
+    @JsonCreator
     private Wallet(
             UUID id,
             WalletNumber walletNumber,

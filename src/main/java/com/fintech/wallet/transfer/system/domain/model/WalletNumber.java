@@ -1,5 +1,6 @@
 package com.fintech.wallet.transfer.system.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fintech.wallet.transfer.system.domain.constant.BusinessError;
 import com.fintech.wallet.transfer.system.domain.exception.BusinessException;
 import lombok.EqualsAndHashCode;
@@ -19,6 +20,7 @@ public final class WalletNumber {
      * @param value wallet number string (must be non-null and non-blank)
      * @throws BusinessException if value is null or blank
      */
+    @JsonCreator
     private WalletNumber(String value) {
         /* check null or empty or white space */
         if (value == null || value.isBlank()) {

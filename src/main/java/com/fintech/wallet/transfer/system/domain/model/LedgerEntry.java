@@ -1,5 +1,6 @@
 package com.fintech.wallet.transfer.system.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fintech.wallet.transfer.system.domain.common.UUIDv7;
 import com.fintech.wallet.transfer.system.domain.constant.TransferType;
 import lombok.EqualsAndHashCode;
@@ -21,6 +22,7 @@ public final class LedgerEntry {
     private final TransferType type;
     private final Instant createdAt;
 
+    @JsonCreator
     private LedgerEntry(
             UUID id,
             UUID transactionId,
