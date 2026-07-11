@@ -115,9 +115,14 @@ The application will start on `http://localhost:8080`
 - Outbox pattern for reliable event publishing (new OutboxEvent entity & migration)
 
 ### 5. Concurrency Testing (Developer)
-- A dedicated endpoint exists to stress-test concurrency using Java virtual threads:
-  - `GET /api/v1/test-concurrency-safety` — runs many virtual-thread tasks that invoke the transfer API and returns a summary of results.
+- Dedicated endpoints exist to stress-test concurrency using Java virtual threads:
+  - `GET /api/v1/test-concurrency-safety/different-request?numberOfRequest=N` — sends N concurrent requests with different idempotency keys and returns a summary of results (can support 100,000 requests)
+  - `GET /api/v1/test-concurrency-safety/same-request?numberOfRequest=N` — sends N concurrent requests with the same idempotency key to test distributed locking and caching
   - Requires Java 21 (Project Loom virtual threads). Use only in development or test environments; do NOT run in production.
+  - Features:
+    - **Virtual Threads**: Uses `Executors.newVirtualThreadPerTaskExecutor()` for efficient concurrency
+    - **Distributed Locking**: Redis-based locks prevent duplicate transaction processing
+    - **Idempotency Caching**: Results are cached and reused for duplicate requests
 
 ### 6. Caching & Performance
 - Redis caching for frequently accessed data
@@ -130,16 +135,22 @@ The application will start on `http://localhost:8080`
 ## API Endpoints
 
 ### Customers
-- `POST /customers` - Create a new customer
-- `GET /customers/{id}` - Get customer details
+- `POST /api/v1/customers` - Create a new customer
+- `GET /api/v1/customers/{id}` - Get customer details
 
 ### Wallets
-- `POST /wallets` - Create a new wallet
-- `GET /wallets/{id}` - Get wallet details
+- `POST /api/v1/wallets` - Create a new wallet
+- `GET /api/v1/wallets/{id}` - Get wallet details
+- `GET /api/v1/wallets/{id}/balance` - Get wallet balance by ID
+- `GET /api/v1/wallets/wallet-number/{walletNumber}/balance` - Get wallet balance by wallet number
 
 ### Transactions
-- `POST /transactions` - Transfer money between wallets
-- `GET /transactions/{id}` - Get transaction details
+- `POST /api/v1/transactions` - Transfer money between wallets (requires `Idempotency-Key` header)
+- `GET /api/v1/transactions/{id}` - Get transaction details
+
+### Concurrency Testing (Development Only)
+- `GET /api/v1/test-concurrency-safety/different-request?numberOfRequest=N` - Test with unique idempotency keys
+- `GET /api/v1/test-concurrency-safety/same-request?numberOfRequest=N` - Test with same idempotency key
 
 ## Configuration
 
